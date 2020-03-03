@@ -2,7 +2,7 @@ from concurrent import futures
 import grpc
 import test_pb2
 import test_pb2_grpc
-import threading
+from threading import Lock
 from collections import deque
 import time
 
@@ -13,19 +13,21 @@ class Queue:
         self.id = number
 
 
-
 class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedServicer):
     queue_map_labels = {}
     queue_map_id = {}
     number = 0
     servers_list = ['10.168.0.3:21000']
     sequence_num = 0
+    lock = Lock()
 
     def qCreate(self, request, context):
         for socket in self.servers_list:  # socket = '192.168.56.101:21000'
             with grpc.insecure_channel(socket) as channel:
                 stub = test_pb2_grpc.FTQueueDistributedStub(channel)
-                queie_id_response = stub.qCreateDistributed(test_pb2.label_Dis(value=request.value,sequence=self.sequence_num))
+                _ = stub.qCreateDistributed(test_pb2.label_Dis(value=request.value,sequence=self.sequence_num))
+        with self.lock:
+            self.sequence_num += 1
         if self.queue_map_labels.get(request.value, False) is not False:
             return test_pb2.queueid(id=self.queue_map_labels.get(request.value).id)
             # return Que_id
@@ -40,6 +42,13 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
     def qPush(self, request, context):
         print('requested_id {} type {}'.format(request.queue_id, type(request.queue_id)))
+        for socket in self.servers_list:  # socket = '192.168.56.101:21000'
+            with grpc.insecure_channel(socket) as channel:
+                stub = test_pb2_grpc.FTQueueDistributedStub(channel)
+                _ = stub.qPushDistributed(test_pb2.Push_message_Dis(queue_id=request.queue_id, value=request.value,
+                                                                    sequence=self.sequence_num))
+        with self.lock:
+            self.sequence_num += 1
         if self.queue_map_id.get(request.queue_id, False) is not False:
             print("log quueu map", self.queue_map_id.get(request.queue_id, False))
             queue_to_push_context = self.queue_map_id.get(request.queue_id)
@@ -52,24 +61,54 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
     def qId(self, request, context):
         label_requested = request.label
         if self.queue_map_labels.get(label_requested, False) is not False:
+            for socket in self.servers_list:  # socket = '192.168.56.101:21000'
+                with grpc.insecure_channel(socket) as channel:
+                    stub = test_pb2_grpc.FTQueueDistributedStub(channel)
+                    _ = stub.qPopDistributed(
+                        test_pb2.queueid_Dis(id=self.queue_map_labels.get(label_requested, False).id, sequence=self.sequence_num))
+            with self.lock:
+                self.sequence_num += 1
             return test_pb2.queueid(id=self.queue_map_labels.get(label_requested, False).id)
         else:
             print("Que name doesnt exist")
+            for socket in self.servers_list:  # socket = '192.168.56.101:21000'
+                with grpc.insecure_channel(socket) as channel:
+                    stub = test_pb2_grpc.FTQueueDistributedStub(channel)
+                    _ = stub.qPopDistributed(
+                        test_pb2.queueid_Dis(id=-1, sequence=self.sequence_num))
+                with self.lock:
+                    self.sequence_num += 1
             return test_pb2.queueid(id=-1)  # return -1 que if label not present
 
     def qPop(self, request, context):
         que_to_pop_from = request.id
+
+        for socket in self.servers_list:  # socket = '192.168.56.101:21000'
+            with grpc.insecure_channel(socket) as channel:
+                stub = test_pb2_grpc.FTQueueDistributedStub(channel)
+                _ = stub.qPopDistributed(test_pb2.queueid_Dis(id=que_to_pop_from, sequence=self.sequence_num))
+
+        with self.lock:
+            self.sequence_num += 1
+
         if self.queue_map_id.get(que_to_pop_from, False) is not False:
             if len(self.queue_map_id[que_to_pop_from]) > 0:
                 element = self.queue_map_id[que_to_pop_from].pop()  # returns an item from the front of a queue
             else:
                 element = ' '
+
             return test_pb2.Item(value=element)
         else:
             return test_pb2.Item(value=' ')
 
     def qTop(self, request, context):
         que_to_pop_from = request.id
+        for socket in self.servers_list:  # socket = '192.168.56.101:21000'
+            with grpc.insecure_channel(socket) as channel:
+                stub = test_pb2_grpc.FTQueueDistributedStub(channel)
+                _ = stub.qTopDistributed(test_pb2.queueid_Dis(id=que_to_pop_from, sequence=self.sequence_num))
+        with self.lock:
+            self.sequence_num += 1
         if self.queue_map_id.get(que_to_pop_from, False) is not False:
             if len(self.queue_map_id[que_to_pop_from]) > 0:
                 element = self.queue_map_id[que_to_pop_from][0]  # returns an item from the front of a queue
@@ -81,6 +120,12 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
     def qSize(self, request, context):
         que_to_pop_from = request.id
+        for socket in self.servers_list:  # socket = '192.168.56.101:21000'
+            with grpc.insecure_channel(socket) as channel:
+                stub = test_pb2_grpc.FTQueueDistributedStub(channel)
+                _ = stub.qTopDistributed(test_pb2.queueid_Dis(id=que_to_pop_from, sequence=self.sequence_num))
+        with self.lock:
+            self.sequence_num += 1
         if self.queue_map_id.get(que_to_pop_from, False) is not False:
             element = len(self.queue_map_id[que_to_pop_from])  # returns an item from the front of a queue
             return test_pb2.QueLength(length=element)
@@ -89,6 +134,13 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
     def qDestroy(self, request, context):
         que_label = request.value
+        for socket in self.servers_list:  # socket = '192.168.56.101:21000'
+            with grpc.insecure_channel(socket) as channel:
+                stub = test_pb2_grpc.FTQueueDistributedStub(channel)
+                _ = stub.qDestroyDistributed(test_pb2.label_Dis(value=que_label, sequence=self.sequence_num))
+        with self.lock:
+            self.sequence_num += 1
+
         if self.queue_map_labels.get(que_label, False) is not False:
             del self.queue_map_id[self.queue_map_labels[que_label].id]
             del self.queue_map_labels[que_label]
@@ -180,8 +232,6 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             return test_pb2.void()
         else:
             return test_pb2.void()
-
-
 
 
 def serve_ftqueue_service():
