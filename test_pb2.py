@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\ntest.proto\"\x16\n\x05label\x12\r\n\x05value\x18\x01 \x01(\t\"\x15\n\x07queueid\x12\n\n\x02id\x18\x01 \x01(\x05\"/\n\x0cPush_message\x12\x10\n\x08queue_id\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\"\x15\n\x04Item\x12\r\n\x05value\x18\x01 \x01(\t\"\x1b\n\tQueLength\x12\x0e\n\x06length\x18\x01 \x01(\x05\"\x06\n\x04void\"2\n\tlabel_Dis\x12\r\n\x05value\x18\x01 \x01(\t\x12\x16\n\x0eSequenceNumber\x18\x02 \x01(\x05\"1\n\x0bqueueid_Dis\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x16\n\x0eSequenceNumber\x18\x02 \x01(\x05\"K\n\x10Push_message_Dis\x12\x10\n\x08queue_id\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\x12\x16\n\x0eSequenceNumber\x18\x03 \x01(\x05\"1\n\x08Item_Dis\x12\r\n\x05value\x18\x01 \x01(\t\x12\x16\n\x0eSequenceNumber\x18\x02 \x01(\x05\"7\n\rQueLength_Dis\x12\x0e\n\x06length\x18\x01 \x01(\x05\x12\x16\n\x0eSequenceNumber\x18\x02 \x01(\x05\"\n\n\x08void_Dis2\xd8\x01\n\x07\x46TQueue\x12\x1d\n\x07qCreate\x12\x06.label\x1a\x08.queueid\"\x00\x12\x1f\n\x05qPush\x12\r.Push_message\x1a\x05.void\"\x00\x12\x19\n\x03qId\x12\x06.label\x1a\x08.queueid\"\x00\x12\x19\n\x04qPop\x12\x08.queueid\x1a\x05.Item\"\x00\x12\x19\n\x04qTop\x12\x08.queueid\x1a\x05.Item\"\x00\x12\x1f\n\x05qSize\x12\x08.queueid\x1a\n.QueLength\"\x00\x12\x1b\n\x08qDestroy\x12\x06.label\x1a\x05.void\"\x00\x32\xa5\x02\n\x12\x46TQueueDistributed\x12%\n\x12qCreateDistributed\x12\x06.label\x1a\x05.void\"\x00\x12*\n\x10qPushDistributed\x12\r.Push_message\x1a\x05.void\"\x00\x12!\n\x0eqIdDistributed\x12\x06.label\x1a\x05.void\"\x00\x12$\n\x0fqPopDistributed\x12\x08.queueid\x1a\x05.void\"\x00\x12$\n\x0fqTopDistributed\x12\x08.queueid\x1a\x05.void\"\x00\x12%\n\x10qSizeDistributed\x12\x08.queueid\x1a\x05.void\"\x00\x12&\n\x13qDestroyDistributed\x12\x06.label\x1a\x05.void\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\ntest.proto\"\x16\n\x05label\x12\r\n\x05value\x18\x01 \x01(\t\"\x15\n\x07queueid\x12\n\n\x02id\x18\x01 \x01(\x05\"/\n\x0cPush_message\x12\x10\n\x08queue_id\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\"\x15\n\x04Item\x12\r\n\x05value\x18\x01 \x01(\t\"\x1b\n\tQueLength\x12\x0e\n\x06length\x18\x01 \x01(\x05\"\x06\n\x04void\",\n\tlabel_Dis\x12\r\n\x05value\x18\x01 \x01(\t\x12\x10\n\x08sequence\x18\x02 \x01(\x05\"+\n\x0bqueueid_Dis\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x10\n\x08sequence\x18\x02 \x01(\x05\"E\n\x10Push_message_Dis\x12\x10\n\x08queue_id\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\x12\x10\n\x08sequence\x18\x03 \x01(\x05\"+\n\x08Item_Dis\x12\r\n\x05value\x18\x01 \x01(\t\x12\x10\n\x08sequence\x18\x02 \x01(\x05\"1\n\rQueLength_Dis\x12\x0e\n\x06length\x18\x01 \x01(\x05\x12\x10\n\x08sequence\x18\x02 \x01(\x05\"\n\n\x08void_Dis2\xd8\x01\n\x07\x46TQueue\x12\x1d\n\x07qCreate\x12\x06.label\x1a\x08.queueid\"\x00\x12\x1f\n\x05qPush\x12\r.Push_message\x1a\x05.void\"\x00\x12\x19\n\x03qId\x12\x06.label\x1a\x08.queueid\"\x00\x12\x19\n\x04qPop\x12\x08.queueid\x1a\x05.Item\"\x00\x12\x19\n\x04qTop\x12\x08.queueid\x1a\x05.Item\"\x00\x12\x1f\n\x05qSize\x12\x08.queueid\x1a\n.QueLength\"\x00\x12\x1b\n\x08qDestroy\x12\x06.label\x1a\x05.void\"\x00\x32\xc1\x02\n\x12\x46TQueueDistributed\x12)\n\x12qCreateDistributed\x12\n.label_Dis\x1a\x05.void\"\x00\x12.\n\x10qPushDistributed\x12\x11.Push_message_Dis\x1a\x05.void\"\x00\x12%\n\x0eqIdDistributed\x12\n.label_Dis\x1a\x05.void\"\x00\x12(\n\x0fqPopDistributed\x12\x0c.queueid_Dis\x1a\x05.void\"\x00\x12(\n\x0fqTopDistributed\x12\x0c.queueid_Dis\x1a\x05.void\"\x00\x12)\n\x10qSizeDistributed\x12\x0c.queueid_Dis\x1a\x05.void\"\x00\x12*\n\x13qDestroyDistributed\x12\n.label_Dis\x1a\x05.void\"\x00\x62\x06proto3'
 )
 
 
@@ -225,7 +225,7 @@ _LABEL_DIS = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='SequenceNumber', full_name='label_Dis.SequenceNumber', index=1,
+      name='sequence', full_name='label_Dis.sequence', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -244,7 +244,7 @@ _LABEL_DIS = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=170,
-  serialized_end=220,
+  serialized_end=214,
 )
 
 
@@ -263,7 +263,7 @@ _QUEUEID_DIS = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='SequenceNumber', full_name='queueid_Dis.SequenceNumber', index=1,
+      name='sequence', full_name='queueid_Dis.sequence', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -281,8 +281,8 @@ _QUEUEID_DIS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=222,
-  serialized_end=271,
+  serialized_start=216,
+  serialized_end=259,
 )
 
 
@@ -308,7 +308,7 @@ _PUSH_MESSAGE_DIS = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='SequenceNumber', full_name='Push_message_Dis.SequenceNumber', index=2,
+      name='sequence', full_name='Push_message_Dis.sequence', index=2,
       number=3, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -326,8 +326,8 @@ _PUSH_MESSAGE_DIS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=273,
-  serialized_end=348,
+  serialized_start=261,
+  serialized_end=330,
 )
 
 
@@ -346,7 +346,7 @@ _ITEM_DIS = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='SequenceNumber', full_name='Item_Dis.SequenceNumber', index=1,
+      name='sequence', full_name='Item_Dis.sequence', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -364,8 +364,8 @@ _ITEM_DIS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=350,
-  serialized_end=399,
+  serialized_start=332,
+  serialized_end=375,
 )
 
 
@@ -384,7 +384,7 @@ _QUELENGTH_DIS = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='SequenceNumber', full_name='QueLength_Dis.SequenceNumber', index=1,
+      name='sequence', full_name='QueLength_Dis.sequence', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -402,8 +402,8 @@ _QUELENGTH_DIS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=401,
-  serialized_end=456,
+  serialized_start=377,
+  serialized_end=426,
 )
 
 
@@ -426,8 +426,8 @@ _VOID_DIS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=458,
-  serialized_end=468,
+  serialized_start=428,
+  serialized_end=438,
 )
 
 DESCRIPTOR.message_types_by_name['label'] = _LABEL
@@ -536,8 +536,8 @@ _FTQUEUE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=471,
-  serialized_end=687,
+  serialized_start=441,
+  serialized_end=657,
   methods=[
   _descriptor.MethodDescriptor(
     name='qCreate',
@@ -614,15 +614,15 @@ _FTQUEUEDISTRIBUTED = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=1,
   serialized_options=None,
-  serialized_start=690,
-  serialized_end=983,
+  serialized_start=660,
+  serialized_end=981,
   methods=[
   _descriptor.MethodDescriptor(
     name='qCreateDistributed',
     full_name='FTQueueDistributed.qCreateDistributed',
     index=0,
     containing_service=None,
-    input_type=_LABEL,
+    input_type=_LABEL_DIS,
     output_type=_VOID,
     serialized_options=None,
   ),
@@ -631,7 +631,7 @@ _FTQUEUEDISTRIBUTED = _descriptor.ServiceDescriptor(
     full_name='FTQueueDistributed.qPushDistributed',
     index=1,
     containing_service=None,
-    input_type=_PUSH_MESSAGE,
+    input_type=_PUSH_MESSAGE_DIS,
     output_type=_VOID,
     serialized_options=None,
   ),
@@ -640,7 +640,7 @@ _FTQUEUEDISTRIBUTED = _descriptor.ServiceDescriptor(
     full_name='FTQueueDistributed.qIdDistributed',
     index=2,
     containing_service=None,
-    input_type=_LABEL,
+    input_type=_LABEL_DIS,
     output_type=_VOID,
     serialized_options=None,
   ),
@@ -649,7 +649,7 @@ _FTQUEUEDISTRIBUTED = _descriptor.ServiceDescriptor(
     full_name='FTQueueDistributed.qPopDistributed',
     index=3,
     containing_service=None,
-    input_type=_QUEUEID,
+    input_type=_QUEUEID_DIS,
     output_type=_VOID,
     serialized_options=None,
   ),
@@ -658,7 +658,7 @@ _FTQUEUEDISTRIBUTED = _descriptor.ServiceDescriptor(
     full_name='FTQueueDistributed.qTopDistributed',
     index=4,
     containing_service=None,
-    input_type=_QUEUEID,
+    input_type=_QUEUEID_DIS,
     output_type=_VOID,
     serialized_options=None,
   ),
@@ -667,7 +667,7 @@ _FTQUEUEDISTRIBUTED = _descriptor.ServiceDescriptor(
     full_name='FTQueueDistributed.qSizeDistributed',
     index=5,
     containing_service=None,
-    input_type=_QUEUEID,
+    input_type=_QUEUEID_DIS,
     output_type=_VOID,
     serialized_options=None,
   ),
@@ -676,7 +676,7 @@ _FTQUEUEDISTRIBUTED = _descriptor.ServiceDescriptor(
     full_name='FTQueueDistributed.qDestroyDistributed',
     index=6,
     containing_service=None,
-    input_type=_LABEL,
+    input_type=_LABEL_DIS,
     output_type=_VOID,
     serialized_options=None,
   ),
