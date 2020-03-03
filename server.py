@@ -17,14 +17,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
     queue_map_labels = {}
     queue_map_id = {}
     number = 0
-    servers_list = '192.168.56.101:21000'
+    servers_list = '127.0.0.1:21000'
 
     def qCreate(self, request, context):
         if self.queue_map_labels.get(request.value, False) is not False:
-            for socket in self.servers_list:  # socket = '192.168.56.101:21000'
-                with grpc.insecure_channel(socket) as channel:
-                    stub = test_pb2_grpc.FTQueueDistributedStub(channel)
-                    queie_id_response = stub.qCreateDistributed(test_pb2.label_Dis(value=request.value)).id
             return test_pb2.queueid(id=self.queue_map_labels.get(request.value).id)
             # return Que_id
         else:
@@ -95,8 +91,9 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             return test_pb2.void()
 
     def qCreateDistributed(self, request, context):
+        print("yo", request.sequence)
         if self.queue_map_labels.get(request.value, False) is not False:
-            return test_pb2.queueid(id=self.queue_map_labels.get(request.value).id)
+            return test_pb2.void()
             # return Que_id
         else:
             new_queue = Queue(number=self.number)
@@ -105,12 +102,14 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             id_mapped = self.queue_map_labels.get(request.value).id
             self.number += 1
             print('que_id_value', new_queue.id)
-            return test_pb2.queueid(id=id_mapped)  # return newly createdQue_id
+            return test_pb2.void()  # return newly createdQue_id
+
 
 def serve_ftqueue_service():
     print("Starting FTqueue service on port 21000")
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=1))
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=2))
     try:
+        test_pb2_grpc.add_FTQueueDistributedServicer_to_server(Listener(), server)
         test_pb2_grpc.add_FTQueueServicer_to_server(Listener(), server)
         server.add_insecure_port("0.0.0.0:21000")
         server.start()
