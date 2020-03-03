@@ -96,7 +96,8 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             return test_pb2.void()
 
     def qCreateDistributed(self, request, context):
-        print("yo", request.sequence)
+        sequence_num = request.sequence
+        print("qCreateDistri ", sequence_num)
         if self.queue_map_labels.get(request.value, False) is not False:
             return test_pb2.void()
             # return Que_id
@@ -108,6 +109,78 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             self.number += 1
             print('que_id_value', new_queue.id)
             return test_pb2.void()  # return newly createdQue_id
+
+    def qPushDistributed(self, request, context):
+        sequence_num = request.sequence
+        print("qPushDistri ", sequence_num)
+        print('requested_id {} type {}'.format(request.queue_id, type(request.queue_id)))
+        if self.queue_map_id.get(request.queue_id, False) is not False:
+            print("log map", self.queue_map_id.get(request.queue_id, False))
+            queue_to_push_context = self.queue_map_id.get(request.queue_id)
+            queue_to_push_context.append(request.value)
+            print("added value {} to queue {}".format(request.value, request.queue_id))
+            return test_pb2.void()
+        else:
+            return test_pb2.void()
+
+    def qIdDistributed(self, request, context):
+        sequence_num = request.sequence
+        print("qId ", sequence_num)
+        label_requested = request.label
+        if self.queue_map_labels.get(label_requested, False) is not False:
+            return test_pb2.void()
+        else:
+            print("Que name doesnt exist")
+            return test_pb2.void()  # return -1 que if label not present
+
+    def qPopDistributed(self, request, context):
+        sequence_num = request.sequence
+        print("qPop ", sequence_num)
+        que_to_pop_from = request.id
+        if self.queue_map_id.get(que_to_pop_from, False) is not False:
+            if len(self.queue_map_id[que_to_pop_from]) > 0:
+                element = self.queue_map_id[que_to_pop_from].pop()  # returns an item from the front of a queue
+            else:
+                element = ' '
+            return test_pb2.void()
+        else:
+            return test_pb2.void()
+
+    def qTopDistributed(self, request, context):
+        sequence_num = request.sequence
+        print("qTop ", sequence_num)
+        que_to_pop_from = request.id
+        if self.queue_map_id.get(que_to_pop_from, False) is not False:
+            if len(self.queue_map_id[que_to_pop_from]) > 0:
+                element = self.queue_map_id[que_to_pop_from][0]  # returns an item from the front of a queue
+            else:
+                element=' '
+            return test_pb2.void()
+        else:
+            return test_pb2.void()
+
+    def qSizeDistributed(self, request, context):
+        sequence_num = request.sequence
+        print("qSize ", sequence_num)
+        que_to_pop_from = request.id
+        if self.queue_map_id.get(que_to_pop_from, False) is not False:
+            element = len(self.queue_map_id[que_to_pop_from])  # returns an item from the front of a queue
+            return test_pb2.void()
+        else:
+            return test_pb2.void()
+
+    def qDestroyDistributed(self, request, context):
+        sequence_num = request.sequence
+        print("destroy ", sequence_num)
+        que_label = request.value
+        if self.queue_map_labels.get(que_label, False) is not False:
+            del self.queue_map_id[self.queue_map_labels[que_label].id]
+            del self.queue_map_labels[que_label]
+            return test_pb2.void()
+        else:
+            return test_pb2.void()
+
+
 
 
 def serve_ftqueue_service():
