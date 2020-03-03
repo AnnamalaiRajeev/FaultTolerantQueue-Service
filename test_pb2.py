@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\ntest.proto\"\x16\n\x05label\x12\r\n\x05value\x18\x01 \x01(\t\"\x15\n\x07queueid\x12\n\n\x02id\x18\x01 \x01(\x05\"/\n\x0cPush_message\x12\x10\n\x08queue_id\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\"\x15\n\x04Item\x12\r\n\x05value\x18\x01 \x01(\t\"\x1b\n\tQueLength\x12\x0e\n\x06length\x18\x01 \x01(\x05\"\x06\n\x04void2\xd8\x01\n\x07\x46TQueue\x12\x1d\n\x07qCreate\x12\x06.label\x1a\x08.queueid\"\x00\x12\x1f\n\x05qPush\x12\r.Push_message\x1a\x05.void\"\x00\x12\x19\n\x03qId\x12\x06.label\x1a\x08.queueid\"\x00\x12\x19\n\x04qPop\x12\x08.queueid\x1a\x05.Item\"\x00\x12\x19\n\x04qTop\x12\x08.queueid\x1a\x05.Item\"\x00\x12\x1f\n\x05qSize\x12\x08.queueid\x1a\n.QueLength\"\x00\x12\x1b\n\x08qDestroy\x12\x06.label\x1a\x05.void\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\ntest.proto\"\x16\n\x05label\x12\r\n\x05value\x18\x01 \x01(\t\"\x15\n\x07queueid\x12\n\n\x02id\x18\x01 \x01(\x05\"/\n\x0cPush_message\x12\x10\n\x08queue_id\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\"\x15\n\x04Item\x12\r\n\x05value\x18\x01 \x01(\t\"\x1b\n\tQueLength\x12\x0e\n\x06length\x18\x01 \x01(\x05\"\x06\n\x04void\"2\n\tlabel_Dis\x12\r\n\x05value\x18\x01 \x01(\t\x12\x16\n\x0eSequenceNumber\x18\x02 \x01(\x05\"1\n\x0bqueueid_Dis\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x16\n\x0eSequenceNumber\x18\x02 \x01(\x05\"K\n\x10Push_message_Dis\x12\x10\n\x08queue_id\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\x12\x16\n\x0eSequenceNumber\x18\x03 \x01(\x05\"1\n\x08Item_Dis\x12\r\n\x05value\x18\x01 \x01(\t\x12\x16\n\x0eSequenceNumber\x18\x02 \x01(\x05\"7\n\rQueLength_Dis\x12\x0e\n\x06length\x18\x01 \x01(\x05\x12\x16\n\x0eSequenceNumber\x18\x02 \x01(\x05\"\n\n\x08void_Dis2\xd8\x01\n\x07\x46TQueue\x12\x1d\n\x07qCreate\x12\x06.label\x1a\x08.queueid\"\x00\x12\x1f\n\x05qPush\x12\r.Push_message\x1a\x05.void\"\x00\x12\x19\n\x03qId\x12\x06.label\x1a\x08.queueid\"\x00\x12\x19\n\x04qPop\x12\x08.queueid\x1a\x05.Item\"\x00\x12\x19\n\x04qTop\x12\x08.queueid\x1a\x05.Item\"\x00\x12\x1f\n\x05qSize\x12\x08.queueid\x1a\n.QueLength\"\x00\x12\x1b\n\x08qDestroy\x12\x06.label\x1a\x05.void\"\x00\x32\xa5\x02\n\x12\x46TQueueDistributed\x12%\n\x12qCreateDistributed\x12\x06.label\x1a\x05.void\"\x00\x12*\n\x10qPushDistributed\x12\r.Push_message\x1a\x05.void\"\x00\x12!\n\x0eqIdDistributed\x12\x06.label\x1a\x05.void\"\x00\x12$\n\x0fqPopDistributed\x12\x08.queueid\x1a\x05.void\"\x00\x12$\n\x0fqTopDistributed\x12\x08.queueid\x1a\x05.void\"\x00\x12%\n\x10qSizeDistributed\x12\x08.queueid\x1a\x05.void\"\x00\x12&\n\x13qDestroyDistributed\x12\x06.label\x1a\x05.void\"\x00\x62\x06proto3'
 )
 
 
@@ -209,12 +209,239 @@ _VOID = _descriptor.Descriptor(
   serialized_end=168,
 )
 
+
+_LABEL_DIS = _descriptor.Descriptor(
+  name='label_Dis',
+  full_name='label_Dis',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='value', full_name='label_Dis.value', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='SequenceNumber', full_name='label_Dis.SequenceNumber', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=170,
+  serialized_end=220,
+)
+
+
+_QUEUEID_DIS = _descriptor.Descriptor(
+  name='queueid_Dis',
+  full_name='queueid_Dis',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='queueid_Dis.id', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='SequenceNumber', full_name='queueid_Dis.SequenceNumber', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=222,
+  serialized_end=271,
+)
+
+
+_PUSH_MESSAGE_DIS = _descriptor.Descriptor(
+  name='Push_message_Dis',
+  full_name='Push_message_Dis',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='queue_id', full_name='Push_message_Dis.queue_id', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='Push_message_Dis.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='SequenceNumber', full_name='Push_message_Dis.SequenceNumber', index=2,
+      number=3, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=273,
+  serialized_end=348,
+)
+
+
+_ITEM_DIS = _descriptor.Descriptor(
+  name='Item_Dis',
+  full_name='Item_Dis',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='value', full_name='Item_Dis.value', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='SequenceNumber', full_name='Item_Dis.SequenceNumber', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=350,
+  serialized_end=399,
+)
+
+
+_QUELENGTH_DIS = _descriptor.Descriptor(
+  name='QueLength_Dis',
+  full_name='QueLength_Dis',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='length', full_name='QueLength_Dis.length', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='SequenceNumber', full_name='QueLength_Dis.SequenceNumber', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=401,
+  serialized_end=456,
+)
+
+
+_VOID_DIS = _descriptor.Descriptor(
+  name='void_Dis',
+  full_name='void_Dis',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=458,
+  serialized_end=468,
+)
+
 DESCRIPTOR.message_types_by_name['label'] = _LABEL
 DESCRIPTOR.message_types_by_name['queueid'] = _QUEUEID
 DESCRIPTOR.message_types_by_name['Push_message'] = _PUSH_MESSAGE
 DESCRIPTOR.message_types_by_name['Item'] = _ITEM
 DESCRIPTOR.message_types_by_name['QueLength'] = _QUELENGTH
 DESCRIPTOR.message_types_by_name['void'] = _VOID
+DESCRIPTOR.message_types_by_name['label_Dis'] = _LABEL_DIS
+DESCRIPTOR.message_types_by_name['queueid_Dis'] = _QUEUEID_DIS
+DESCRIPTOR.message_types_by_name['Push_message_Dis'] = _PUSH_MESSAGE_DIS
+DESCRIPTOR.message_types_by_name['Item_Dis'] = _ITEM_DIS
+DESCRIPTOR.message_types_by_name['QueLength_Dis'] = _QUELENGTH_DIS
+DESCRIPTOR.message_types_by_name['void_Dis'] = _VOID_DIS
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 label = _reflection.GeneratedProtocolMessageType('label', (_message.Message,), {
@@ -259,6 +486,48 @@ void = _reflection.GeneratedProtocolMessageType('void', (_message.Message,), {
   })
 _sym_db.RegisterMessage(void)
 
+label_Dis = _reflection.GeneratedProtocolMessageType('label_Dis', (_message.Message,), {
+  'DESCRIPTOR' : _LABEL_DIS,
+  '__module__' : 'test_pb2'
+  # @@protoc_insertion_point(class_scope:label_Dis)
+  })
+_sym_db.RegisterMessage(label_Dis)
+
+queueid_Dis = _reflection.GeneratedProtocolMessageType('queueid_Dis', (_message.Message,), {
+  'DESCRIPTOR' : _QUEUEID_DIS,
+  '__module__' : 'test_pb2'
+  # @@protoc_insertion_point(class_scope:queueid_Dis)
+  })
+_sym_db.RegisterMessage(queueid_Dis)
+
+Push_message_Dis = _reflection.GeneratedProtocolMessageType('Push_message_Dis', (_message.Message,), {
+  'DESCRIPTOR' : _PUSH_MESSAGE_DIS,
+  '__module__' : 'test_pb2'
+  # @@protoc_insertion_point(class_scope:Push_message_Dis)
+  })
+_sym_db.RegisterMessage(Push_message_Dis)
+
+Item_Dis = _reflection.GeneratedProtocolMessageType('Item_Dis', (_message.Message,), {
+  'DESCRIPTOR' : _ITEM_DIS,
+  '__module__' : 'test_pb2'
+  # @@protoc_insertion_point(class_scope:Item_Dis)
+  })
+_sym_db.RegisterMessage(Item_Dis)
+
+QueLength_Dis = _reflection.GeneratedProtocolMessageType('QueLength_Dis', (_message.Message,), {
+  'DESCRIPTOR' : _QUELENGTH_DIS,
+  '__module__' : 'test_pb2'
+  # @@protoc_insertion_point(class_scope:QueLength_Dis)
+  })
+_sym_db.RegisterMessage(QueLength_Dis)
+
+void_Dis = _reflection.GeneratedProtocolMessageType('void_Dis', (_message.Message,), {
+  'DESCRIPTOR' : _VOID_DIS,
+  '__module__' : 'test_pb2'
+  # @@protoc_insertion_point(class_scope:void_Dis)
+  })
+_sym_db.RegisterMessage(void_Dis)
+
 
 
 _FTQUEUE = _descriptor.ServiceDescriptor(
@@ -267,8 +536,8 @@ _FTQUEUE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=171,
-  serialized_end=387,
+  serialized_start=471,
+  serialized_end=687,
   methods=[
   _descriptor.MethodDescriptor(
     name='qCreate',
@@ -337,5 +606,83 @@ _FTQUEUE = _descriptor.ServiceDescriptor(
 _sym_db.RegisterServiceDescriptor(_FTQUEUE)
 
 DESCRIPTOR.services_by_name['FTQueue'] = _FTQUEUE
+
+
+_FTQUEUEDISTRIBUTED = _descriptor.ServiceDescriptor(
+  name='FTQueueDistributed',
+  full_name='FTQueueDistributed',
+  file=DESCRIPTOR,
+  index=1,
+  serialized_options=None,
+  serialized_start=690,
+  serialized_end=983,
+  methods=[
+  _descriptor.MethodDescriptor(
+    name='qCreateDistributed',
+    full_name='FTQueueDistributed.qCreateDistributed',
+    index=0,
+    containing_service=None,
+    input_type=_LABEL,
+    output_type=_VOID,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='qPushDistributed',
+    full_name='FTQueueDistributed.qPushDistributed',
+    index=1,
+    containing_service=None,
+    input_type=_PUSH_MESSAGE,
+    output_type=_VOID,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='qIdDistributed',
+    full_name='FTQueueDistributed.qIdDistributed',
+    index=2,
+    containing_service=None,
+    input_type=_LABEL,
+    output_type=_VOID,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='qPopDistributed',
+    full_name='FTQueueDistributed.qPopDistributed',
+    index=3,
+    containing_service=None,
+    input_type=_QUEUEID,
+    output_type=_VOID,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='qTopDistributed',
+    full_name='FTQueueDistributed.qTopDistributed',
+    index=4,
+    containing_service=None,
+    input_type=_QUEUEID,
+    output_type=_VOID,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='qSizeDistributed',
+    full_name='FTQueueDistributed.qSizeDistributed',
+    index=5,
+    containing_service=None,
+    input_type=_QUEUEID,
+    output_type=_VOID,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='qDestroyDistributed',
+    full_name='FTQueueDistributed.qDestroyDistributed',
+    index=6,
+    containing_service=None,
+    input_type=_LABEL,
+    output_type=_VOID,
+    serialized_options=None,
+  ),
+])
+_sym_db.RegisterServiceDescriptor(_FTQUEUEDISTRIBUTED)
+
+DESCRIPTOR.services_by_name['FTQueueDistributed'] = _FTQUEUEDISTRIBUTED
 
 # @@protoc_insertion_point(module_scope)
