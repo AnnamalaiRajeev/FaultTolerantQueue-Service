@@ -9,7 +9,7 @@ import time
 
 def run_client():
     pid = os.getpid()
-    with grpc.insecure_channel('192.168.56.101:21000') as channel:
+    with grpc.insecure_channel('127.0.0.1:21000') as channel:
         stub = test_pb2_grpc.FTQueueStub(channel)
         while True:
             try:

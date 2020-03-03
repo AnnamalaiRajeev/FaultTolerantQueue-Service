@@ -17,9 +17,14 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
     queue_map_labels = {}
     queue_map_id = {}
     number = 0
-    servers_list = '127.0.0.1:21000'
+    servers_list = ['10.168.0.3:21000']
+    sequence_num = 0
 
     def qCreate(self, request, context):
+        for socket in self.servers_list:  # socket = '192.168.56.101:21000'
+            with grpc.insecure_channel(socket) as channel:
+                stub = test_pb2_grpc.FTQueueDistributedStub(channel)
+                queie_id_response = stub.qCreateDistributed(test_pb2.label_Dis(value=request.value,sequence=self.sequence_num))
         if self.queue_map_labels.get(request.value, False) is not False:
             return test_pb2.queueid(id=self.queue_map_labels.get(request.value).id)
             # return Que_id
