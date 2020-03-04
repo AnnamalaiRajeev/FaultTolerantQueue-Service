@@ -561,6 +561,8 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             sequence_number_to_request = self.sequence_num + 1
             self.request_message_retry(sequence_number_to_request)
 
+        return test_pb2.void_Dis()
+
     def qSizeDistributed(self, request, context):
         token_num = request.sequence
         print("qSize ", token_num)
@@ -594,6 +596,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
             self.request_message_retry(sequence_number_to_request)
+        return test_pb2.void_Dis()
 
     def qDestroyDistributed(self, request, context):
         token_num = request.sequence
