@@ -70,7 +70,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                         for socket in self.servers_list:
                             ip = socket.split(':')[0]
                             port = int(socket.split(':')[1])
-                            self.udp_send_service(sequence_number=sequence_number+1, request_type='missing', server_address=(ip, port))
+                            self.udp_send_service(sequence_number=sequence_number+1, request_type=b'missing', server_address=(ip, port))
 
                 if service is 'missing':  # resend message to server that requested the missing sequence number
                     if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None):
@@ -102,7 +102,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
     def udp_send_service(self, sequence_number, request_type, server_address): # request_type = b'update'
         delimiter = b'#%?'
-        server_address[1] = 22000
+        server_address = (server_address[0], 22000)
         y = sequence_number.to_bytes((sequence_number.bit_length() + 7) // 8, byteorder='little')
         self.send_sock.sendto(y + delimiter + request_type, server_address)
 
@@ -110,10 +110,11 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         for socket in self.servers_list:
             ip = socket.split(':')[0]
             port = int(socket.split(':')[1])
-            self.udp_send_service(sequence_number=token_num, request_type='token', server_address=(ip, port))
+            self.udp_send_service(sequence_number=token_num, request_type=b'token', server_address=(ip, port))
 
     def qCreate(self, request, context):
         sequence_number = self.increment_sequence_num()  # increment sequence number for a new request
+        print("incremented_sequence_number{} {}".format(sequence_number,self.sequence_num))
         params = test_pb2.label_Dis(value=request.value, sequence=sequence_number)
         service = 'qCreateDistributed'
 
@@ -323,8 +324,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             return test_pb2.QueLength(length=-1)
 
     def qDestroy(self, request, context):
+
         que_label = request.value
         sequence_number = self.increment_sequence_num()
+        print("destroy _sequence Track {} {}".format(sequence_number, self.sequence_num))
         params = test_pb2.label_Dis(value=que_label, sequence=sequence_number)
         service = 'qDestroyDistributed'
 
@@ -417,6 +420,11 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 return test_pb2.void()
 
         if token_num == self.sequence_num + 1:
+            if token_num % self.number_of_servers == self.server_id:
+                deliver_message_to_ftque()
+                new_number = self.increment_sequence_num()
+                self.circulate_token(token_num=new_number)
+
             start = time.time()
             while True:
                 time.sleep(0.1)
@@ -445,6 +453,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 return test_pb2.void()  # return -1 que if label not present
 
         if token_num == self.sequence_num + 1:
+            if token_num % self.number_of_servers == self.server_id:
+                deliver_message_to_ftque()
+                new_number = self.increment_sequence_num()
+                self.circulate_token(token_num=new_number)
             start = time.time()
             while True:
                 time.sleep(0.1)
@@ -476,6 +488,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 return test_pb2.void()
 
         if token_num == self.sequence_num + 1:
+            if token_num % self.number_of_servers == self.server_id:
+                deliver_message_to_ftque()
+                new_number = self.increment_sequence_num()
+                self.circulate_token(token_num=new_number)
             start = time.time()
             while True:
                 time.sleep(0.1)
@@ -507,6 +523,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 return test_pb2.void()
 
         if token_num == self.sequence_num + 1:
+            if token_num % self.number_of_servers == self.server_id:
+                deliver_message_to_ftque()
+                new_number = self.increment_sequence_num()
+                self.circulate_token(token_num=new_number)
             start = time.time()
             while True:
                 time.sleep(0.1)
@@ -535,6 +555,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 return test_pb2.void()
 
         if token_num == self.sequence_num + 1:
+            if token_num % self.number_of_servers == self.server_id:
+                deliver_message_to_ftque()
+                new_number = self.increment_sequence_num()
+                self.circulate_token(token_num=new_number)
             start = time.time()
             while True:
                 time.sleep(0.1)
@@ -564,6 +588,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 return test_pb2.void()
 
         if token_num == self.sequence_num + 1:
+            if token_num % self.number_of_servers == self.server_id:
+                deliver_message_to_ftque()
+                new_number = self.increment_sequence_num()
+                self.circulate_token(token_num=new_number)
             start = time.time()
             while True:
                 time.sleep(0.1)
@@ -584,17 +612,17 @@ def serve_ftqueue_service():
     print("Starting FTqueue service on port 21000")
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=2))
     try:
-        test_pb2_grpc.add_FTQueueDistributedServicer_to_server(Listener(), server)
+        service = Listener()
+        test_pb2_grpc.add_FTQueueDistributedServicer_to_server(service, server)
         test_pb2_grpc.add_FTQueueServicer_to_server(Listener(), server)
         server.add_insecure_port("0.0.0.0:21000")
         server.start()
-        obj_2 = Listener()
-        obj_2.udp_recieve_service()
+        service.udp_recieve_service()
         while True:
             time.sleep(5)
-            print(obj_2.queue_map_id)
-            print(obj_2.queue_map_labels)
-            print(obj_2.sequence_num)
+            print(service.queue_map_id)
+            print(service.queue_map_labels)
+            print(service.sequence_num)
             pass
     except KeyboardInterrupt:
         print("Gracefull exit")
