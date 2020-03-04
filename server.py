@@ -61,8 +61,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 sequence_number, service = data.split(b"#%?")
                 sequence_number = int.from_bytes(bytes=sequence_number, byteorder='little')
                 Neg_ack_from_address = address[0] + ':' + str(address[1])
+                service = service.decode('utf-8')
 
                 if service is 'token':
+                    print("circulated token recieved on UDP Socket from {}".format(Neg_ack_from_address))
                     if sequence_number == self.sequence_num+1: # if the sequence number received is the next sequence number
                         _ = self.increment_sequence_num()  # if token received from neighbor update sequence number
                     if sequence_number > self.sequence_num+1: # then request sequence_number + 1 from master
@@ -73,6 +75,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                             self.udp_send_service(sequence_number=sequence_number+1, request_type=b'missing', server_address=(ip, port))
 
                 if service is 'missing':  # resend message to server that requested the missing sequence number
+                    print("missing token request recieved on UDP Socket from {}".format(Neg_ack_from_address))
                     if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None):
                         # how to map the channel { 1 : { channel: 10.1.1.1:20000 }
                         with grpc.insecure_channel(Neg_ack_from_address) as channel:
@@ -80,18 +83,38 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                             # execute RPC call
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qCreateDistributed':
                                 _ = map(stub.qCreateDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                print(
+                                    "executed call 'qCreateDistributed' call request recieved from server {}".format(Neg_ack_from_address))
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qPushDistributed':
                                 _ = map(stub.qPushDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                print(
+                                    "executed call 'qPushDistributed' call request recieved from server {}".format(
+                                        Neg_ack_from_address))
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qIdDistributed':
                                 _ = map(stub.qIdDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                print(
+                                    "executed call 'qIdDistributed' call request recieved from server {}".format(
+                                        Neg_ack_from_address))
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qPopDistributed':
                                 _ = map(stub.qPopDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                print(
+                                    "executed call 'qPopDistributed' call request recieved from server {}".format(
+                                        Neg_ack_from_address))
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qTopDistributed':
                                 _ = map(stub.qTopDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                print(
+                                    "executed call 'qTopDistributed' call request recieved from server {}".format(
+                                        Neg_ack_from_address))
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qSizeDistributed':
                                 _ = map(stub.qSizeDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                print(
+                                    "executed call 'qSizeDistributed' call request recieved from server {}".format(
+                                        Neg_ack_from_address))
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qDestroyDistributed':
                                 _ = map(stub.qDestroyDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                print(
+                                    "executed call 'qDestroyDistributed' call request recieved from server {}".format(
+                                        Neg_ack_from_address))
 
                             for x in _:
                                 y = x
