@@ -58,12 +58,15 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         while True:
             try:
                 data, address = socket_udp.recvfrom(4096)
-                sequence_number, service = data.split(b"#%?")
+                sequence_number, service = data.split(b'#%?')
                 sequence_number = int.from_bytes(bytes=sequence_number, byteorder='little')
                 Neg_ack_from_address = address[0] + ':' + str(address[1])
                 service = service.decode('utf-8')
+                print(sequence_number)
+                print(data)
+                print(service)
 
-                if service is 'token':
+                if service == 'token':
                     print("circulated token recieved on UDP Socket from {}".format(Neg_ack_from_address))
                     if sequence_number == self.sequence_num+1: # if the sequence number received is the next sequence number
                         _ = self.increment_sequence_num()  # if token received from neighbor update sequence number
@@ -74,7 +77,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                             port = int(socket.split(':')[1])
                             self.udp_send_service(sequence_number=sequence_number+1, request_type=b'missing', server_address=(ip, port))
 
-                if service is 'missing':  # resend message to server that requested the missing sequence number
+                if service == 'missing':  # resend message to server that requested the missing sequence number
                     print("missing token request recieved on UDP Socket from {}".format(Neg_ack_from_address))
                     if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None):
                         # how to map the channel { 1 : { channel: 10.1.1.1:20000 }
