@@ -167,6 +167,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 self.map_sequence_num_to_Clinet_request_calls[sequence_number] = {'service': service, 'params': params}
 
             if self.sequence_num % self.number_of_servers == self.server_id:
+                print("Circulating token{} by server {}".format(sequence_number, self.server_id))
                 # circulate token if ur the next server to serve token
                 self.circulate_token(token_num=sequence_number)
 
@@ -367,7 +368,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
     def qCreateDistributed(self, request, context):
         token_num = request.sequence
-        print("qCreateDistri ", token_num)
+        print("qCreateDistri token number-- >recieved {} sequence  number present {}".format(token_num,self.sequence_num))
 
         def deliver_message_to_ftque():
             if self.queue_map_labels.get(request.value, False) is not False:
@@ -384,9 +385,11 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         if token_num == self.sequence_num + 1:
             if token_num % self.number_of_servers == self.server_id:
-                deliver_message_to_ftque()
+                print("Token _match delivering message to que")
+                return_message = deliver_message_to_ftque()
                 new_number = self.increment_sequence_num()
                 self.circulate_token(token_num=new_number)
+                return return_message
                 # send synchronize numbers
             start = time.time()
             while True:
@@ -396,12 +399,15 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     # request seq_message
                     break
                 if token_num == self.sequence_num:
-                    deliver_message_to_ftque()
-                    break
+                    print("token_number verified to {}".format(self.sequence_num))
+                    return_message = deliver_message_to_ftque()
+                    return return_message
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
             self.request_message_retry(sequence_number_to_request)
+
+        return test_pb2.void_Dis()
 
     def qPushDistributed(self, request, context):
         token_num = request.sequence
@@ -421,9 +427,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         if token_num == self.sequence_num + 1:
             if token_num % self.number_of_servers == self.server_id:
-                deliver_message_to_ftque()
+                return_message = deliver_message_to_ftque()
                 new_number = self.increment_sequence_num()
                 self.circulate_token(token_num=new_number)
+                return return_message
 
             start = time.time()
             while True:
@@ -433,12 +440,15 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     # request seq_message
                     break
                 if token_num == self.sequence_num:
-                    deliver_message_to_ftque()
-                    break
+                    print("token_number verified to {}".format(self.sequence_num))
+                    return_message = deliver_message_to_ftque()
+                    return return_message
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
             self.request_message_retry(sequence_number_to_request)
+
+        return test_pb2.void_Dis()
 
     def qIdDistributed(self, request, context):
         token_num = request.sequence
@@ -454,9 +464,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         if token_num == self.sequence_num + 1:
             if token_num % self.number_of_servers == self.server_id:
-                deliver_message_to_ftque()
+                return_message = deliver_message_to_ftque()
                 new_number = self.increment_sequence_num()
                 self.circulate_token(token_num=new_number)
+                return return_message
             start = time.time()
             while True:
                 time.sleep(0.1)
@@ -465,12 +476,15 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     # request seq_message
                     break
                 if token_num == self.sequence_num:
-                    deliver_message_to_ftque()
-                    break
+                    print("token_number verified to {}".format(self.sequence_num))
+                    return_message = deliver_message_to_ftque()
+                    return return_message
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
             self.request_message_retry(sequence_number_to_request)
+
+        return test_pb2.void_Dis()
 
     def qPopDistributed(self, request, context):
         token_num = request.sequence
@@ -501,9 +515,9 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     # request seq_message
                     break
                 if token_num == self.sequence_num:
-                    return_value = deliver_message_to_ftque()
-                    return return_value
-
+                    print("token_number verified to {}".format(self.sequence_num))
+                    return_message = deliver_message_to_ftque()
+                    return return_message
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
@@ -527,9 +541,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         if token_num == self.sequence_num + 1:
             if token_num % self.number_of_servers == self.server_id:
-                deliver_message_to_ftque()
+                return_message = deliver_message_to_ftque()
                 new_number = self.increment_sequence_num()
                 self.circulate_token(token_num=new_number)
+                return return_message
             start = time.time()
             while True:
                 time.sleep(0.1)
@@ -538,8 +553,9 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     # request seq_message
                     break
                 if token_num == self.sequence_num:
-                    deliver_message_to_ftque()
-                    break
+                    print("token_number verified to {}".format(self.sequence_num))
+                    return_message = deliver_message_to_ftque()
+                    return return_message
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
@@ -559,9 +575,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         if token_num == self.sequence_num + 1:
             if token_num % self.number_of_servers == self.server_id:
-                deliver_message_to_ftque()
+                return_message = deliver_message_to_ftque()
                 new_number = self.increment_sequence_num()
                 self.circulate_token(token_num=new_number)
+                return return_message
             start = time.time()
             while True:
                 time.sleep(0.1)
@@ -570,8 +587,9 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     # request seq_message
                     break
                 if token_num == self.sequence_num:
-                    deliver_message_to_ftque()
-                    break
+                    print("token_number verified to {}".format(self.sequence_num))
+                    return_message = deliver_message_to_ftque()
+                    return return_message
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
@@ -592,9 +610,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         if token_num == self.sequence_num + 1:
             if token_num % self.number_of_servers == self.server_id:
-                deliver_message_to_ftque()
+                return_message = deliver_message_to_ftque()
                 new_number = self.increment_sequence_num()
                 self.circulate_token(token_num=new_number)
+                return return_message
             start = time.time()
             while True:
                 time.sleep(0.1)
@@ -603,12 +622,15 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     # request seq_message
                     break
                 if token_num == self.sequence_num:
-                    deliver_message_to_ftque()
-                    break
+                    print("token_number verified to {}".format(self.sequence_num))
+                    return_message = deliver_message_to_ftque()
+                    return return_message
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
             self.request_message_retry(sequence_number_to_request)
+
+        return test_pb2.void_Dis()
 
 
 def serve_ftqueue_service():
