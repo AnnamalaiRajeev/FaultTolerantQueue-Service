@@ -6,7 +6,7 @@ from threading import Lock
 from collections import deque
 import time
 import socket
-import sys
+import threading
 from threader import run_thread
 
 
@@ -57,6 +57,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         socket_udp = server.sock
         while True:
             try:
+                print("threader id for udpserver", threading.current_thread().ident)
                 data, address = socket_udp.recvfrom(4096)
                 sequence_number, service = data.split(b'#%?')
                 sequence_number = int.from_bytes(bytes=sequence_number, byteorder='little')
@@ -69,6 +70,8 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 if service == 'token':
                     print("circulated token recieved on UDP Socket from {}".format(Neg_ack_from_address))
                     if sequence_number == self.sequence_num+1: # if the sequence number received is the next sequence number
+                        print("attempting to increment token ")
+                        print("i'm stuck here")
                         _ = self.increment_sequence_num()  # if token received from neighbor update sequence number
                     if sequence_number > self.sequence_num+1: # then request sequence_number + 1 from master
                         # generate negative ack to all servers # master will respond with appropriate call
@@ -461,6 +464,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 return test_pb2.void_Dis()
 
         if token_num == self.sequence_num + 1:
+            time.sleep(0.2)
             print("yes the token recieved is +1 of the existing sequence number")
             if token_num % self.number_of_servers == self.server_id:
                 print("I'm the coordinator for this message")
@@ -471,18 +475,21 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
             start = time.time()
             while True:
+                print("threader id for qpushdist", threading.current_thread().ident)
                 print("I,m not the coordinator for this message")
                 print("waiting for message sync for token "
                       "from coordinator server_id".format(token_num % self.number_of_servers))
-                time.sleep(0.1)
-                if time.time() - start >= float(2):  # Assuming upper bound of 2 Sec
-                    self.request_message_retry(token_num)  # request_type = b'missing'
-                    # request seq_message
-                    break
                 if token_num == self.sequence_num:
                     print("token_number is now matching with sequence number : {}  Delivering message to queue".format(self.sequence_num))
                     return_message = deliver_message_to_ftque(self)
                     return return_message
+                time.sleep(0.5)
+                if time.time() - start >= float(3):  # Assuming upper bound of 2 Sec
+                    self.request_message_retry(token_num)  # request_type = b'missing'
+                    # request seq_message
+                    break
+                print(self.sequence_num)
+
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
@@ -692,6 +699,7 @@ def serve_ftqueue_service():
             print(service.queue_map_labels)
             print(service.sequence_num)
             print("mapping of service calls :",service.map_sequence_num_to_Clinet_request_calls)
+            print(threading.enumerate())
             pass
     except KeyboardInterrupt:
         print("Gracefull exit")
