@@ -500,8 +500,9 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 return test_pb2.void_Dis()
             else:
                 return test_pb2.void_Dis()
-        if token_num == self.sequence_num:
 
+        if token_num == self.sequence_num:
+            pass
 
         if token_num == self.sequence_num + 1:
             time.sleep(0.2)
