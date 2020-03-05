@@ -41,7 +41,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
     queue_map_labels = {}
     queue_map_id = {}
     number = 0
-    servers_list = ['10.168.0.3:21000']
+    servers_list = ['10.178.0.2:21000']
     # sequence_num = 0
     lock = Lock()
     map_sequence_num_to_Clinet_request_calls = {}
@@ -70,6 +70,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 sequence_number, service = data.split(b'#%?')
                 sequence_number = int.from_bytes(bytes=sequence_number, byteorder='little')
                 Neg_ack_from_address = address[0] + ':' + str(address[1])
+                Rpc_server_neg_ack = address[0] + ':' + str(21000)
                 service = service.decode('utf-8')
                 print("token recieved on udp {}".format(sequence_number))
                 print("data {} recieved on udp from {}".format(data, Neg_ack_from_address))
@@ -79,9 +80,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     print("circulated token recieved on UDP Socket from {}".format(Neg_ack_from_address))
                     if sequence_number == self.sequence_num+1: # if the sequence number received is the next sequence number
                         print("attempting to increment token ")
-                        print("i'm stuck here {}".format(time.time()))
                         _ = self.increment_sequence_num()  # if token received from neighbor update sequence number
-                        print("stuck released {}".format(time.time()))
                     if sequence_number > self.sequence_num+1: # then request sequence_number + 1 from master
                         # generate negative ack to all servers # master will respond with appropriate call
                         for socket in self.servers_list:
@@ -90,60 +89,69 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                             self.udp_send_service(sequence_number=sequence_number+1, request_type=b'missing', server_address=(ip, port))
 
                 if service == 'missing':  # resend message to server that requested the missing sequence number
-                    print("missing token request recieved on UDP Socket from {}".format(Neg_ack_from_address))
-                    if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None):
+                    print("missing token request recieved on UDP Socket from {}".format(Rpc_server_neg_ack))
+                    if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None):  # only server with cache will reply
                         # how to map the channel { 1 : { channel: 10.1.1.1:20000 }
                         with grpc.insecure_channel(Neg_ack_from_address) as channel:
                             stub = test_pb2_grpc.FTQueueDistributedStub(channel)
                             # execute RPC call
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qCreateDistributed':
-                                _ = map(stub.qCreateDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                _ = map(stub.qCreateDistributed, [self.map_sequence_num_to_Clinet_request_calls[sequence_number]['params']])
                                 print(
                                     "executed call 'qCreateDistributed' call request recieved from server {}".format(Neg_ack_from_address))
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qPushDistributed':
-                                _ = map(stub.qPushDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                _ = map(stub.qPushDistributed, [self.map_sequence_num_to_Clinet_request_calls[sequence_number]['params']])
                                 print(
                                     "executed call 'qPushDistributed' call request recieved from server {}".format(
                                         Neg_ack_from_address))
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qIdDistributed':
-                                _ = map(stub.qIdDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                _ = map(stub.qIdDistributed, [self.map_sequence_num_to_Clinet_request_calls[sequence_number]['params']])
                                 print(
                                     "executed call 'qIdDistributed' call request recieved from server {}".format(
                                         Neg_ack_from_address))
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qPopDistributed':
-                                _ = map(stub.qPopDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                _ = map(stub.qPopDistributed, [self.map_sequence_num_to_Clinet_request_calls[sequence_number]['params']])
                                 print(
                                     "executed call 'qPopDistributed' call request recieved from server {}".format(
                                         Neg_ack_from_address))
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qTopDistributed':
-                                _ = map(stub.qTopDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                _ = map(stub.qTopDistributed, [self.map_sequence_num_to_Clinet_request_calls[sequence_number]['params']])
                                 print(
                                     "executed call 'qTopDistributed' call request recieved from server {}".format(
                                         Neg_ack_from_address))
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qSizeDistributed':
-                                _ = map(stub.qSizeDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                _ = map(stub.qSizeDistributed, [self.map_sequence_num_to_Clinet_request_calls[sequence_number]['params']])
                                 print(
                                     "executed call 'qSizeDistributed' call request recieved from server {}".format(
                                         Neg_ack_from_address))
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qDestroyDistributed':
-                                _ = map(stub.qDestroyDistributed, [self.map_sequence_num_to_Clinet_request_calls['params']])
+                                _ = map(stub.qDestroyDistributed, [self.map_sequence_num_to_Clinet_request_calls[sequence_number]['params']])
                                 print(
                                     "executed call 'qDestroyDistributed' call request recieved from server {}".format(
                                         Neg_ack_from_address))
 
                             for x in _:
                                 y = x
+                    time.sleep(0.15)
+                    # only the coordinator server will reply the token
+                    if sequence_number % self.number_of_servers == self.server_id:
+                            self.udp_send_service(sequence_number=sequence_number,request_type=b'token',server_address=address)
 
             except Exception as e:
                 print("UDP listening service raised error: ", e)
                 pass
 
     def udp_send_service(self, sequence_number, request_type, server_address): # request_type = b'update'
+        # self.udp_send_service(number, b'missing', (ip, port))
+        send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         delimiter = b'#%?'
-        print("sending token number {}, request type {} to server address {}".format(sequence_number,request_type,server_address))
-        server_address = (server_address[0], 22000)
+        server_address_to_send = (server_address[0], 22000)
+        print("sending token number {}, request type {} to server address {}".format(sequence_number, request_type,
+                                                                                     server_address_to_send))
         y = sequence_number.to_bytes((sequence_number.bit_length() + 7) // 8, byteorder='little')
-        self.send_sock.sendto(y + delimiter + request_type, server_address)
+        print("sending message {}".format(y+delimiter+request_type))
+        send_sock.sendto(y + delimiter + request_type, server_address_to_send)
+        send_sock.close()
 
     def circulate_token(self, token_num):
         print("circulating token number {}".format(token_num))
@@ -212,7 +220,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     _ = stub.qPushDistributed(params)
 
         def sync_systems(self):
-            message_pass(self)
+            try:
+                message_pass(self)
+            except:
+                pass
 
             with self.lock:
                 self.map_sequence_num_to_Clinet_request_calls[sequence_number] = {'service': service, 'params': params}
@@ -429,14 +440,16 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         else:
             return test_pb2.void()
 
+    @run_thread
     def request_message_retry(self, number):
         print("Sending request_message_retry for token number {}".format(number))
-
+        time.sleep(1)
         for socket in self.servers_list:
             # request message from all servers master responds
             ip = socket.split(':')[0]
             port = int(socket.split(':')[1])
-            self.udp_send_service(number, b'missing', (ip, port))  # request_type = b'update'
+            self.udp_send_service(sequence_number=number, request_type=b'missing', server_address=(ip, port))  # request_type = b'update'
+            # self.udp_send_service(sequence_number=token_num, request_type=b'token', server_address=(ip, port))
 
     def qCreateDistributed(self, request, context):
         token_num = request.sequence
@@ -481,7 +494,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
-            self.request_message_retry(sequence_number_to_request)
+            while sequence_number_to_request < token_num:
+                sequence_number_to_request = self.sequence_num + 1
+                self.request_message_retry(sequence_number_to_request)
+                time.sleep(0.2)
 
         return test_pb2.void_Dis()
 
@@ -531,9 +547,13 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     break
                 print(self.sequence_num)
 
+
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
-            self.request_message_retry(sequence_number_to_request)
+            while sequence_number_to_request < token_num:
+                sequence_number_to_request = self.sequence_num + 1
+                self.request_message_retry(sequence_number_to_request)
+                time.sleep(0.2
 
         return test_pb2.void_Dis()
 
@@ -569,7 +589,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
-            self.request_message_retry(sequence_number_to_request)
+            while sequence_number_to_request < token_num:
+                sequence_number_to_request = self.sequence_num + 1
+                self.request_message_retry(sequence_number_to_request)
+                time.sleep(0.2
 
         return test_pb2.void_Dis()
 
@@ -608,7 +631,11 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
-            self.request_message_retry(sequence_number_to_request)
+            while sequence_number_to_request < token_num:
+                sequence_number_to_request = self.sequence_num + 1
+                self.request_message_retry(sequence_number_to_request)
+                time.sleep(0.2)
+
         return test_pb2.void_Dis()
 
     def qTopDistributed(self, request, context):
@@ -646,7 +673,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
-            self.request_message_retry(sequence_number_to_request)
+            while sequence_number_to_request < token_num:
+                sequence_number_to_request = self.sequence_num + 1
+                self.request_message_retry(sequence_number_to_request)
+                time.sleep(0.2)
 
         return test_pb2.void_Dis()
 
@@ -682,7 +712,11 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
-            self.request_message_retry(sequence_number_to_request)
+            while sequence_number_to_request < token_num:
+                sequence_number_to_request = self.sequence_num + 1
+                self.request_message_retry(sequence_number_to_request)
+                time.sleep(0.2)
+
         return test_pb2.void_Dis()
 
     def qDestroyDistributed(self, request, context):
@@ -718,7 +752,10 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
-            self.request_message_retry(sequence_number_to_request)
+            while sequence_number_to_request < token_num:
+                sequence_number_to_request = self.sequence_num + 1
+                self.request_message_retry(sequence_number_to_request)
+                time.sleep(0.2)
 
         return test_pb2.void_Dis()
 
