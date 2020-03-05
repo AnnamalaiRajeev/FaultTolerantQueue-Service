@@ -399,7 +399,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
     def qCreateDistributed(self, request, context):
         token_num = request.sequence
-        print("qCreateDistri token number-- >recieved {} sequence  number present {}".format(token_num,self.sequence_num))
+        print("qCreateDistri token number-- >recieved {} sequence  number present {}".format(token_num, self.sequence_num))
 
         def deliver_message_to_ftque(self):
             if self.queue_map_labels.get(request.value, False) is not False:
@@ -461,7 +461,9 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 return test_pb2.void_Dis()
 
         if token_num == self.sequence_num + 1:
+            print("yes the token recieved is +1 of the existing sequence number")
             if token_num % self.number_of_servers == self.server_id:
+                print("I'm the coordinator for this message")
                 return_message = deliver_message_to_ftque(self)
                 new_number = self.increment_sequence_num()
                 self.circulate_token(token_num=new_number)
@@ -469,13 +471,16 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
             start = time.time()
             while True:
+                print("I,m not the coordinator for this message")
+                print("waiting for message sync for token "
+                      "from coordinator server_id".format(token_num % self.number_of_servers))
                 time.sleep(0.1)
                 if time.time() - start >= float(2):  # Assuming upper bound of 2 Sec
                     self.request_message_retry(token_num)  # request_type = b'missing'
                     # request seq_message
                     break
                 if token_num == self.sequence_num:
-                    print("token_number verified to {}".format(self.sequence_num))
+                    print("token_number is now matching with sequence number : {}  Delivering message to queue".format(self.sequence_num))
                     return_message = deliver_message_to_ftque(self)
                     return return_message
 
