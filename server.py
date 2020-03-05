@@ -43,7 +43,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
     map_sequence_num_to_Clinet_request_calls = {}
     send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     number_of_servers = 2
-    server_id = 0  # master
+    server_id = 1  # master
 
     def increment_sequence_num(self):
         with self.lock:
@@ -62,9 +62,9 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 sequence_number = int.from_bytes(bytes=sequence_number, byteorder='little')
                 Neg_ack_from_address = address[0] + ':' + str(address[1])
                 service = service.decode('utf-8')
-                print(sequence_number)
-                print(data)
-                print(service)
+                print("token recieved on udp {}".format(sequence_number))
+                print("data {} recieved on udp from {}".format(data, Neg_ack_from_address))
+                print("service request in token is : {} recieved on udp from {}".format(service, Neg_ack_from_address))
 
                 if service == 'token':
                     print("circulated token recieved on UDP Socket from {}".format(Neg_ack_from_address))
@@ -128,6 +128,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
     def udp_send_service(self, sequence_number, request_type, server_address): # request_type = b'update'
         delimiter = b'#%?'
+        print("sending token number {}, request type {} to server address {}".format(sequence_number,request_type,server_address))
         server_address = (server_address[0], 22000)
         y = sequence_number.to_bytes((sequence_number.bit_length() + 7) // 8, byteorder='little')
         self.send_sock.sendto(y + delimiter + request_type, server_address)
@@ -145,15 +146,17 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         params = test_pb2.label_Dis(value=request.value, sequence=sequence_number)
         service = 'qCreateDistributed'
 
-        def sync_systems():
+        def sync_systems(self):
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
                     _ = stub.qCreateDistributed(params)
                     # map client request and corresponding messages to sequence number and respective recievers
+            print("syncing systems with message qCreateDistributed")
 
             with self.lock:
                 self.map_sequence_num_to_Clinet_request_calls[sequence_number] = {'service': service, 'params': params}
+
 
             if self.sequence_num % self.number_of_servers == self.server_id:
                 # circulate token if ur the next server to serve token
@@ -161,7 +164,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         # sync systems # message passing
         try:
-            sync_systems()
+            sync_systems(self)
         except Exception as e:
             print("failed to perform sync systems due to error {}".format(e))
 
@@ -184,7 +187,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         params = test_pb2.Push_message_Dis(queue_id=request.queue_id, value=request.value, sequence=sequence_number)
         service = 'qPushDistributed'
 
-        def sync_systems():
+        def sync_systems(self):
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
@@ -200,7 +203,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         # sync systems # message passing
         try:
-            sync_systems()
+            sync_systems(self)
         except Exception as e:
             print("failed to perform sync systems due to error {}".format(e))
 
@@ -219,7 +222,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         label_requested = request.label
         params = test_pb2.label_Dis(value=request.value, sequence=sequence_number)
         service = 'qIdDistributed'
-        def sync_systems():
+        def sync_systems(self):
 
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
@@ -235,7 +238,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         # sync systems # message passing
         try:
-            sync_systems()
+            sync_systems(self)
         except Exception as e:
             print("failed to perform sync systems due to error {}".format(e))
 
@@ -252,7 +255,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         params = test_pb2.queueid_Dis(id=que_to_pop_from, sequence=sequence_number)
         service = 'qPopDistributed'
 
-        def sync_systems():
+        def sync_systems(self):
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
@@ -267,7 +270,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         # sync systems # message passing
         try:
-            sync_systems()
+            sync_systems(self)
         except Exception as e:
             print("failed to perform sync systems due to error {}".format(e))
 
@@ -289,7 +292,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         params = test_pb2.queueid_Dis(id=que_to_pop_from, sequence=sequence_number)
         service = 'qTopDistributed'
 
-        def sync_systems():
+        def sync_systems(self):
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
@@ -304,7 +307,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         # sync systems # message passing
         try:
-            sync_systems()
+            sync_systems(self)
         except Exception as e:
             print("failed to perform sync systems due to error {}".format(e))
 
@@ -325,7 +328,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         params = test_pb2.queueid_Dis(id=que_to_pop_from, sequence=self.sequence_num)
         service = 'qSizeDistributed'
 
-        def sync_systems():
+        def sync_systems(self):
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
@@ -340,7 +343,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         # sync systems # message passing
         try:
-            sync_systems()
+            sync_systems(self)
         except Exception as e:
             print("failed to perform sync systems due to error {}".format(e))
 
@@ -359,7 +362,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         params = test_pb2.label_Dis(value=que_label, sequence=sequence_number)
         service = 'qDestroyDistributed'
 
-        def sync_systems():
+        def sync_systems(self):
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
@@ -374,7 +377,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
         # sync systems # message passing
         try:
-            sync_systems()
+            sync_systems(self)
         except Exception as e:
             print("failed to perform sync systems due to error {}".format(e))
 
@@ -683,6 +686,7 @@ def serve_ftqueue_service():
             print(service.queue_map_id)
             print(service.queue_map_labels)
             print(service.sequence_num)
+            print("mapping of service calls :",service.map_sequence_num_to_Clinet_request_calls)
             pass
     except KeyboardInterrupt:
         print("Gracefull exit")
