@@ -32,18 +32,26 @@ class UdpServer:
             print("unable to start udp server")
 
 
+class SharedObject:
+    sequence_num = 0
+
+
 class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedServicer):
 
     queue_map_labels = {}
     queue_map_id = {}
     number = 0
     servers_list = ['10.168.0.3:21000']
-    sequence_num = 0
+    # sequence_num = 0
     lock = Lock()
     map_sequence_num_to_Clinet_request_calls = {}
     send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     number_of_servers = 2
     server_id = 1  # master
+
+    def __init__(self, shared_object):
+        super().__init__()
+        self.sequence_num = shared_object.sequence_num
 
     def increment_sequence_num(self):
         with self.lock:
@@ -71,8 +79,9 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     print("circulated token recieved on UDP Socket from {}".format(Neg_ack_from_address))
                     if sequence_number == self.sequence_num+1: # if the sequence number received is the next sequence number
                         print("attempting to increment token ")
-                        print("i'm stuck here")
+                        print("i'm stuck here {}".format(time.time()))
                         _ = self.increment_sequence_num()  # if token received from neighbor update sequence number
+                        print("stuck released {}".format(time.time()))
                     if sequence_number > self.sequence_num+1: # then request sequence_number + 1 from master
                         # generate negative ack to all servers # master will respond with appropriate call
                         for socket in self.servers_list:
@@ -189,6 +198,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         sequence_number = self.increment_sequence_num()  # increment sequence number for a new request
         params = test_pb2.Push_message_Dis(queue_id=request.queue_id, value=request.value, sequence=sequence_number)
         service = 'qPushDistributed'
+        print(self.map_sequence_num_to_Clinet_request_calls)
 
         def sync_systems(self):
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
@@ -687,9 +697,10 @@ def serve_ftqueue_service():
     print("Starting FTqueue service on port 21000")
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=6))
     try:
-        service = Listener()
+        shared_object = SharedObject()
+        service = Listener(shared_object)
         test_pb2_grpc.add_FTQueueDistributedServicer_to_server(service, server)
-        test_pb2_grpc.add_FTQueueServicer_to_server(Listener(), server)
+        test_pb2_grpc.add_FTQueueServicer_to_server(service, server)
         server.add_insecure_port("0.0.0.0:21000")
         server.start()
         service.udp_recieve_service()
@@ -698,7 +709,7 @@ def serve_ftqueue_service():
             print(service.queue_map_id)
             print(service.queue_map_labels)
             print(service.sequence_num)
-            print("mapping of service calls :",service.map_sequence_num_to_Clinet_request_calls)
+            print("mapping of service calls :", service.map_sequence_num_to_Clinet_request_calls)
             print(threading.enumerate())
             pass
     except KeyboardInterrupt:
