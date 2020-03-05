@@ -81,12 +81,15 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     if sequence_number == self.sequence_num+1: # if the sequence number received is the next sequence number
                         print("attempting to increment token ")
                         _ = self.increment_sequence_num()  # if token received from neighbor update sequence number
+
+                    '''
                     if sequence_number > self.sequence_num+1: # then request sequence_number + 1 from master
                         # generate negative ack to all servers # master will respond with appropriate call
                         for socket in self.servers_list:
                             ip = socket.split(':')[0]
                             port = int(socket.split(':')[1])
                             self.udp_send_service(sequence_number=sequence_number+1, request_type=b'missing', server_address=(ip, port))
+                    '''
 
                 if service == 'missing':  # resend message to server that requested the missing sequence number
                     print("missing token request recieved on UDP Socket from {}".format(Rpc_server_neg_ack))
@@ -497,7 +500,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             while sequence_number_to_request < token_num:
                 sequence_number_to_request = self.sequence_num + 1
                 self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.2)
+                time.sleep(0.5)
 
         return test_pb2.void_Dis()
 
@@ -547,13 +550,12 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     break
                 print(self.sequence_num)
 
-
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
             while sequence_number_to_request < token_num:
                 sequence_number_to_request = self.sequence_num + 1
                 self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.2
+                time.sleep(0.5)
 
         return test_pb2.void_Dis()
 
@@ -592,7 +594,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             while sequence_number_to_request < token_num:
                 sequence_number_to_request = self.sequence_num + 1
                 self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.2
+                time.sleep(0.5)
 
         return test_pb2.void_Dis()
 
@@ -634,7 +636,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             while sequence_number_to_request < token_num:
                 sequence_number_to_request = self.sequence_num + 1
                 self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.2)
+                time.sleep(0.5)
 
         return test_pb2.void_Dis()
 
@@ -676,7 +678,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             while sequence_number_to_request < token_num:
                 sequence_number_to_request = self.sequence_num + 1
                 self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.2)
+                time.sleep(0.5)
 
         return test_pb2.void_Dis()
 
@@ -715,7 +717,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             while sequence_number_to_request < token_num:
                 sequence_number_to_request = self.sequence_num + 1
                 self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.2)
+                time.sleep(0.5)
 
         return test_pb2.void_Dis()
 
@@ -755,7 +757,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             while sequence_number_to_request < token_num:
                 sequence_number_to_request = self.sequence_num + 1
                 self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.2)
+                time.sleep(0.5)
 
         return test_pb2.void_Dis()
 
