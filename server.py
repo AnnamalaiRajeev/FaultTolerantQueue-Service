@@ -7,6 +7,7 @@ from collections import deque
 import time
 import socket
 import threading
+from threader import run_thread
 
 
 class Queue:
@@ -156,17 +157,21 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         params = test_pb2.label_Dis(value=request.value, sequence=sequence_number)
         service = 'qCreateDistributed'
 
-        def sync_systems(self):
+        @run_thread
+        def message_pass(self): # map client request and corresponding messages to sequence number and respective recievers
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
                     _ = stub.qCreateDistributed(params)
-                    # map client request and corresponding messages to sequence number and respective recievers
+
+        def sync_systems(self):
+            message_pass(self)
+
             print("syncing systems with message qCreateDistributed")
 
             with self.lock:
                 self.map_sequence_num_to_Clinet_request_calls[sequence_number] = {'service': service, 'params': params}
-
+            time.sleep(0.1)
 
             if self.sequence_num % self.number_of_servers == self.server_id:
                 # circulate token if ur the next server to serve token
@@ -198,11 +203,15 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         service = 'qPushDistributed'
         print(self.map_sequence_num_to_Clinet_request_calls)
 
-        def sync_systems(self):
+        @run_thread
+        def message_pass(self):  # map client request and corresponding messages to sequence number and respective recievers
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
                     _ = stub.qPushDistributed(params)
+
+        def sync_systems(self):
+            message_pass(self)
 
             with self.lock:
                 self.map_sequence_num_to_Clinet_request_calls[sequence_number] = {'service': service, 'params': params}
@@ -233,16 +242,19 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         label_requested = request.label
         params = test_pb2.label_Dis(value=request.value, sequence=sequence_number)
         service = 'qIdDistributed'
-        def sync_systems(self):
 
+        @run_thread
+        def message_pass(self):
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
                     _ = stub.qIdDistributed(params)
 
+        def sync_systems(self):
+            message_pass(self)
             with self.lock:
                 self.map_sequence_num_to_Clinet_request_calls[sequence_number] = {'service': service, 'params': params}
-
+            time.sleep(0.2)
             if self.sequence_num % self.number_of_servers == self.server_id:
                 # circulate token if ur the next server to serve token
                 self.circulate_token(token_num=sequence_number)
@@ -266,11 +278,15 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         params = test_pb2.queueid_Dis(id=que_to_pop_from, sequence=sequence_number)
         service = 'qPopDistributed'
 
-        def sync_systems(self):
+        @run_thread
+        def message_pass(self):  # map client request and corresponding messages to sequence number and respective recievers
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
                     _ = stub.qPopDistributed(params)
+
+        def sync_systems(self):
+            message_pass(self)
 
             with self.lock:
                 self.map_sequence_num_to_Clinet_request_calls[sequence_number] = {'service': service, 'params': params}
@@ -303,15 +319,19 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         params = test_pb2.queueid_Dis(id=que_to_pop_from, sequence=sequence_number)
         service = 'qTopDistributed'
 
-        def sync_systems(self):
+        @run_thread
+        def message_pass(self):  # map client request and corresponding messages to sequence number and respective recievers
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
                     _ = stub.qTopDistributed(params)
 
+        def sync_systems(self):
+            message_pass(self)
+
             with self.lock:
                 self.map_sequence_num_to_Clinet_request_calls[sequence_number] = {'service': service, 'params': params}
-
+            time.sleep(0.2)
             if self.sequence_num % self.number_of_servers == self.server_id:
                 # circulate token if ur the next server to serve token
                 self.circulate_token(token_num=sequence_number)
@@ -339,14 +359,18 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         params = test_pb2.queueid_Dis(id=que_to_pop_from, sequence=self.sequence_num)
         service = 'qSizeDistributed'
 
-        def sync_systems(self):
+        @run_thread
+        def message_pass(self):  # map client request and corresponding messages to sequence number and respective recievers
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
                     _ = stub.qSizeDistributed(test_pb2.queueid_Dis(id=que_to_pop_from, sequence=sequence_number))
 
+        def sync_systems(self):
+            message_pass(self)
             with self.lock:
                 self.map_sequence_num_to_Clinet_request_calls[sequence_number] = {'service': service, 'params': params}
+            time.sleep(0.2)
 
             if self.sequence_num % self.number_of_servers == self.server_id:
                 # circulate token if ur the next server to serve token
@@ -373,15 +397,19 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         params = test_pb2.label_Dis(value=que_label, sequence=sequence_number)
         service = 'qDestroyDistributed'
 
-        def sync_systems(self):
+        @run_thread
+        def message_pass(self):  # map client request and corresponding messages to sequence number and respective recievers
             for socket in self.servers_list:  # socket = '192.168.56.101:21000'
                 with grpc.insecure_channel(socket) as channel:
                     stub = test_pb2_grpc.FTQueueDistributedStub(channel)
                     _ = stub.qDestroyDistributed(params)
 
+        def sync_systems(self):
+            message_pass(self)
             with self.lock:
                 self.map_sequence_num_to_Clinet_request_calls[sequence_number] = {'service': service, 'params': params}
 
+            time.sleep(0.2)
             if self.sequence_num % self.number_of_servers == self.server_id:
                 # circulate token if ur the next server to serve token
                 self.circulate_token(token_num=sequence_number)
