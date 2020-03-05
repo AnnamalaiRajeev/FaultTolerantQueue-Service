@@ -7,7 +7,6 @@ from collections import deque
 import time
 import socket
 import threading
-from threader import run_thread
 
 
 class Queue:
@@ -59,7 +58,6 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             num = self.sequence_num
         return num
 
-    @run_thread
     def udp_recieve_service(self):
         server = UdpServer()
         socket_udp = server.sock
@@ -703,7 +701,8 @@ def serve_ftqueue_service():
         test_pb2_grpc.add_FTQueueServicer_to_server(service, server)
         server.add_insecure_port("0.0.0.0:21000")
         server.start()
-        service.udp_recieve_service()
+        with futures.ThreadPoolExecutor(max_workers=2) as executor:
+            executor.submit(service.udp_recieve_service)
         while True:
             time.sleep(5)
             print(service.queue_map_id)
