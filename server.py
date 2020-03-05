@@ -216,7 +216,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
             with self.lock:
                 self.map_sequence_num_to_Clinet_request_calls[sequence_number] = {'service': service, 'params': params}
-
+            time.sleep(0.3)
             if self.sequence_num % self.number_of_servers == self.server_id:
                 print("Circulating token{} by server {}".format(sequence_number, self.server_id))
                 # circulate token if ur the next server to serve token
@@ -291,6 +291,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
             with self.lock:
                 self.map_sequence_num_to_Clinet_request_calls[sequence_number] = {'service': service, 'params': params}
+            time.sleep(0.3)
 
             if self.sequence_num % self.number_of_servers == self.server_id:
                 # circulate token if ur the next server to serve token
@@ -499,6 +500,8 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 return test_pb2.void_Dis()
             else:
                 return test_pb2.void_Dis()
+        if token_num == self.sequence_num:
+
 
         if token_num == self.sequence_num + 1:
             time.sleep(0.2)
