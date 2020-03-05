@@ -64,7 +64,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         socket_udp = server.sock
         while True:
             try:
-                print("threader id for udpserver", threading.current_thread().ident)
+                # print("threader id for udpserver", threading.current_thread().ident)
                 data, address = socket_udp.recvfrom(4096)
                 sequence_number, service = data.split(b'#%?')
                 sequence_number = int.from_bytes(bytes=sequence_number, byteorder='little')
@@ -511,7 +511,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
             start = time.time()
             while True:
-                print("threader id for qpushdist", threading.current_thread().ident)
+                # print("threader id for qpushdist", threading.current_thread().ident)
                 print("I,m not the coordinator for this message")
                 print("waiting for message sync for token "
                       "from coordinator server_id".format(token_num % self.number_of_servers))
@@ -525,7 +525,6 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     # request seq_message
                     break
                 print(self.sequence_num)
-
 
         elif token_num > self.sequence_num + 1:
             sequence_number_to_request = self.sequence_num + 1
