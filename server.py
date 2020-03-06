@@ -508,7 +508,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
     def qPushDistributed(self, request, context):
         token_num = request.sequence
-        print("qPushDistri ", token_num)
+        print("qPushDistri token number in message {}, sequence number present {}".format(token_num,self.sequence_num))
 
         def deliver_message_to_ftque(self):
 
@@ -523,7 +523,8 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 return test_pb2.void_Dis()
 
         if token_num == self.sequence_num:
-            pass
+            return_meesage = deliver_message_to_ftque(self)
+            return return_meesage
 
         if token_num == self.sequence_num + 1:
             time.sleep(0.2)
