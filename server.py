@@ -41,13 +41,13 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
     queue_map_labels = {}
     queue_map_id = {}
     number = 0
-    servers_list = ['10.178.0.2:21000']
+    servers_list = ['10.168.0.3:21000']
     # sequence_num = 0
     lock = Lock()
     map_sequence_num_to_Clinet_request_calls = {}
     send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     number_of_servers = 2
-    server_id = 1  # master
+    server_id = 0  # master
 
     def __init__(self, shared_object):
         super().__init__()
@@ -95,7 +95,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     print("missing token request recieved on UDP Socket from {}".format(Rpc_server_neg_ack))
                     if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None):  # only server with cache will reply
                         # how to map the channel { 1 : { channel: 10.1.1.1:20000 }
-                        with grpc.insecure_channel(Neg_ack_from_address) as channel:
+                        with grpc.insecure_channel(Rpc_server_neg_ack) as channel:
                             stub = test_pb2_grpc.FTQueueDistributedStub(channel)
                             # execute RPC call
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qCreateDistributed':
