@@ -483,7 +483,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         print("qCreateDistri token number-- >recieved {} sequence  number present {}".format(token_num, self.sequence_num))
 
         def deliver_message_to_ftque(self, token):
-            if self.track_token_recieved.get(token) is True:
+            if self.track_token_recieved(token) is True:
                 if self.queue_map_labels.get(request.value, False) is not False:
                     return test_pb2.void_Dis()
                     # return Que_id
@@ -536,7 +536,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         print("qPushDistri token number in message {}, sequence number present {}".format(token_num, self.sequence_num))
 
         def deliver_message_to_ftque(self, token):
-            if self.track_token_recieved.get(token) is True:
+            if self.track_token_recieved(token) is True:
                 print('requested_id {} type {}'.format(request.queue_id, type(request.queue_id)))
                 if self.queue_map_id.get(request.queue_id, False) is not False:
                     print("log map", self.queue_map_id.get(request.queue_id, False))
@@ -592,7 +592,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         label_requested = request.label
 
         def deliver_message_to_ftque(self, token):
-            if self.track_token_recieved.get(token) is True:
+            if self.track_token_recieved(token) is True:
                 if self.queue_map_labels.get(label_requested, False) is not False:
                     return test_pb2.void_Dis()
                 else:
@@ -634,7 +634,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         que_to_pop_from = request.id
 
         def deliver_message_to_ftque(self, token):
-            if self.track_token_recieved.get(token) is True:
+            if self.track_token_recieved(token) is True:
                 if self.queue_map_id.get(que_to_pop_from, False) is not False:
                     if len(self.queue_map_id[que_to_pop_from]) > 0:
                         element = self.queue_map_id[que_to_pop_from].pop()  # returns an item from the front of a queue
@@ -679,7 +679,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         que_to_pop_from = request.id
 
         def deliver_message_to_ftque(self, token):
-            if self.track_token_recieved.get(token) is True:
+            if self.track_token_recieved(token) is True:
                 if self.queue_map_id.get(que_to_pop_from, False) is not False:
                     if len(self.queue_map_id[que_to_pop_from]) > 0:
                         element = self.queue_map_id[que_to_pop_from][0]  # returns an item from the front of a queue
@@ -724,7 +724,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         que_to_pop_from = request.id
 
         def deliver_message_to_ftque(self, token):
-            if self.track_token_recieved.get(token) is True:
+            if self.track_token_recieved(token) is True:
                 if self.queue_map_id.get(que_to_pop_from, False) is not False:
                     element = len(self.queue_map_id[que_to_pop_from])  # returns an item from the front of a queue
                     return test_pb2.void_Dis()
@@ -766,7 +766,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         que_label = request.value
 
         def deliver_message_to_ftque(self, token):
-            if self.track_token_recieved.get(token) is True:
+            if self.track_token_recieved(token) is True:
                 if self.queue_map_labels.get(que_label, False) is not False:
                     del self.queue_map_id[self.queue_map_labels[que_label].id]
                     del self.queue_map_labels[que_label]
@@ -775,7 +775,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     return test_pb2.void_Dis()
             else:
                 return test_pb2.void_Dis()
-            
+
         if token_num == self.sequence_num:
             return_meesage = deliver_message_to_ftque(self, token_num)
             return return_meesage
