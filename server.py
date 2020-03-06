@@ -95,6 +95,17 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     print("missing token request recieved on UDP Socket from {}".format(Rpc_server_neg_ack))
                     if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None):  # only server with cache will reply
                         # how to map the channel { 1 : { channel: 10.1.1.1:20000 }
+
+                        @run_thread
+                        def sync_token(self):
+                            # only the coordinator server will reply the token
+                            time.sleep(0.6)
+                            if sequence_number % self.number_of_servers == self.server_id:
+                                self.udp_send_service(sequence_number=sequence_number, request_type=b'token',
+                                                      server_address=address)
+                                
+                        sync_token(self)
+
                         with grpc.insecure_channel(Rpc_server_neg_ack) as channel:
                             stub = test_pb2_grpc.FTQueueDistributedStub(channel)
                             # execute RPC call
@@ -135,10 +146,8 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
                             for x in _:
                                 y = x
-                    time.sleep(0.15)
-                    # only the coordinator server will reply the token
-                    if sequence_number % self.number_of_servers == self.server_id:
-                            self.udp_send_service(sequence_number=sequence_number,request_type=b'token',server_address=address)
+
+
 
             except Exception as e:
                 print("UDP listening service raised error: ", e)
