@@ -95,7 +95,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     print("missing token request recieved on UDP Socket from {}".format(Rpc_server_neg_ack))
                     if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None):  # only server with cache will reply
                         # how to map the channel { 1 : { channel: 10.1.1.1:20000 }
-                        with grpc.insecure_channel(Neg_ack_from_address) as channel:
+                        with grpc.insecure_channel(Rpc_server_neg_ack) as channel:
                             stub = test_pb2_grpc.FTQueueDistributedStub(channel)
                             # execute RPC call
                             if self.map_sequence_num_to_Clinet_request_calls.get(sequence_number, None)['service'] == 'qCreateDistributed':
@@ -443,7 +443,6 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         else:
             return test_pb2.void()
 
-    @run_thread
     def request_message_retry(self, number):
         print("Sending request_message_retry for token number {}".format(number))
         time.sleep(1)
@@ -453,6 +452,13 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
             port = int(socket.split(':')[1])
             self.udp_send_service(sequence_number=number, request_type=b'missing', server_address=(ip, port))  # request_type = b'update'
             # self.udp_send_service(sequence_number=token_num, request_type=b'token', server_address=(ip, port))
+
+    def perform_if_seq_greater(self, token_num):
+        sequence_number_to_request = self.sequence_num + 1
+        while sequence_number_to_request < token_num:
+            sequence_number_to_request = self.sequence_num + 1
+            self.request_message_retry(sequence_number_to_request)
+            time.sleep(1)
 
     def qCreateDistributed(self, request, context):
         token_num = request.sequence
@@ -496,11 +502,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     return return_message
 
         elif token_num > self.sequence_num + 1:
-            sequence_number_to_request = self.sequence_num + 1
-            while sequence_number_to_request < token_num:
-                sequence_number_to_request = self.sequence_num + 1
-                self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.5)
+            self.perform_if_seq_greater(token_num)
 
         return test_pb2.void_Dis()
 
@@ -551,11 +553,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 print(self.sequence_num)
 
         elif token_num > self.sequence_num + 1:
-            sequence_number_to_request = self.sequence_num + 1
-            while sequence_number_to_request < token_num:
-                sequence_number_to_request = self.sequence_num + 1
-                self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.5)
+            self.perform_if_seq_greater(token_num)
 
         return test_pb2.void_Dis()
 
@@ -590,11 +588,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     return return_message
 
         elif token_num > self.sequence_num + 1:
-            sequence_number_to_request = self.sequence_num + 1
-            while sequence_number_to_request < token_num:
-                sequence_number_to_request = self.sequence_num + 1
-                self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.5)
+            self.perform_if_seq_greater(token_num)
 
         return test_pb2.void_Dis()
 
@@ -632,11 +626,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     return return_message
 
         elif token_num > self.sequence_num + 1:
-            sequence_number_to_request = self.sequence_num + 1
-            while sequence_number_to_request < token_num:
-                sequence_number_to_request = self.sequence_num + 1
-                self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.5)
+            self.perform_if_seq_greater(token_num)
 
         return test_pb2.void_Dis()
 
@@ -650,7 +640,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                 if len(self.queue_map_id[que_to_pop_from]) > 0:
                     element = self.queue_map_id[que_to_pop_from][0]  # returns an item from the front of a queue
                 else:
-                    element=' '
+                    element = ' '
                 return test_pb2.void_Dis()
             else:
                 return test_pb2.void_Dis()
@@ -674,11 +664,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     return return_message
 
         elif token_num > self.sequence_num + 1:
-            sequence_number_to_request = self.sequence_num + 1
-            while sequence_number_to_request < token_num:
-                sequence_number_to_request = self.sequence_num + 1
-                self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.5)
+            self.perform_if_seq_greater(token_num)
 
         return test_pb2.void_Dis()
 
@@ -713,11 +699,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     return return_message
 
         elif token_num > self.sequence_num + 1:
-            sequence_number_to_request = self.sequence_num + 1
-            while sequence_number_to_request < token_num:
-                sequence_number_to_request = self.sequence_num + 1
-                self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.5)
+            self.perform_if_seq_greater(token_num)
 
         return test_pb2.void_Dis()
 
@@ -753,11 +735,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                     return return_message
 
         elif token_num > self.sequence_num + 1:
-            sequence_number_to_request = self.sequence_num + 1
-            while sequence_number_to_request < token_num:
-                sequence_number_to_request = self.sequence_num + 1
-                self.request_message_retry(sequence_number_to_request)
-                time.sleep(0.5)
+            self.perform_if_seq_greater(token_num)
 
         return test_pb2.void_Dis()
 
@@ -778,8 +756,8 @@ def serve_ftqueue_service():
             print(service.queue_map_id)
             print(service.queue_map_labels)
             print(service.sequence_num)
-            print("mapping of service calls :", service.map_sequence_num_to_Clinet_request_calls)
-            print(threading.enumerate())
+            # print("mapping of service calls :", service.map_sequence_num_to_Clinet_request_calls)
+            # print(threading.enumerate())
             pass
     except KeyboardInterrupt:
         print("Gracefull exit")
