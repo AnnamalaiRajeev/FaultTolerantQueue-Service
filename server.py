@@ -48,7 +48,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
     send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     number_of_servers = 2
     server_id = 0  # master
-    server_id = 1  # master
+    # server_id = 1  # master
     token_recieved = {}
 
     def __init__(self, shared_object):
@@ -109,7 +109,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
                         @run_thread
                         def sync_token(self):
                             # only the coordinator server will reply the token
-                            time.sleep(0.6)
+                            time.sleep(0.2)
                             if sequence_number % self.number_of_servers == self.server_id:
                                 self.udp_send_service(sequence_number=sequence_number, request_type=b'token',
                                                       server_address=address)
@@ -464,7 +464,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
 
     def request_message_retry(self, number):
         print("Sending request_message_retry for token number {}".format(number))
-        time.sleep(1)
+        time.sleep(0.1)
         for socket in self.servers_list:
             # request message from all servers master responds
             ip = socket.split(':')[0]
@@ -477,7 +477,7 @@ class Listener(test_pb2_grpc.FTQueueServicer, test_pb2_grpc.FTQueueDistributedSe
         while sequence_number_to_request < token_num:
             sequence_number_to_request = self.sequence_num + 1
             self.request_message_retry(sequence_number_to_request)
-            time.sleep(1)
+            time.sleep(0.2)
 
     def qCreateDistributed(self, request, context):
         token_num = request.sequence
